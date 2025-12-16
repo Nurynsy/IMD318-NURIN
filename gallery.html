@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>A Little Space of Mine</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* ---------------- GLOBAL ---------------- */
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:'Poppins', sans-serif;
+  background:url('pinterest.jpeg') no-repeat center center fixed;
+  background-size:cover;
+  min-height:100vh;
+}
+
+/* dreamy overlay */
+body.nav-open{overflow:hidden;}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(255,225,238,0.55);
+  backdrop-filter:blur(3px);
+  z-index:-3;
+}
+
+a{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+}
+
+/* ---------------- MENU BUTTON ---------------- */
+.menu-btn{
+  position:fixed;
+  top:18px;
+  left:18px;
+  z-index:6000;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(135deg,#ff8bb9,#ffcbe8);
+  color:white;
+  font-size:24px;
+  box-shadow:0 7px 18px rgba(0,0,0,0.15);
+  transition:.2s;
+}
+.menu-btn:hover{transform:scale(1.1);}
+
+/* ---------------- SIDEBAR NAVIGATION ---------------- */
+nav{
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100vh;
+  background:#ffffffee;
+  backdrop-filter:blur(12px);
+  padding:110px 20px 40px;
+  border-radius:0 28px 28px 0;
+  border-right:1px solid rgba(255,150,200,0.4);
+  box-shadow:6px 0 30px rgba(0,0,0,0.15);
+  transition:.35s ease;
+  z-index:5500;
+}
+nav.show{left:0;}
+
+nav ul{
+  padding:0; margin:0;
+  list-style:none;
+  display:flex; flex-direction:column;
+  align-items:center; gap:15px;
+}
+
+nav ul li a{
+  width:205px;
+  padding:13px 0;
+  background:#ffe5f2;
+  border-radius:30px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border:1px solid #ffcee4;
+  font-weight:500;
+  color:#555;
+  box-shadow:0 4px 10px rgba(255,150,190,0.2);
+  transition:.3s, box-shadow .3s;
+  position:relative;
+}
+nav ul li a:hover{
+  background:linear-gradient(135deg,#ff9dcc,#ffd4ec);
+  color:white;
+  transform:translateX(8px);
+  box-shadow:0 6px 15px rgba(255,130,200,0.45);
+}
+
+nav ul li a::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:30px;
+  box-shadow:0 0 0 rgba(255,150,200,0);
+  transition:.3s;
+}
+nav ul li a:hover::after{
+  box-shadow:0 0 25px rgba(255,150,200,0.35);
+}
+
+/* DARK OVERLAY */
+#page-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.28);
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+  z-index:5400;
+}
+body.nav-open #page-overlay{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ---------------- FLOATING FLOWERS ---------------- */
+.flower-container{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:2;
+}
+
+.flower{
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:
+     radial-gradient(circle, #ffd6ea 25%, #ff9fca 45%, #ff5ea6 75%);
+  border-radius:50%;
+  opacity:.7;
+  animation:float linear infinite;
+}
+
+@keyframes float{
+  from{ transform:translateY(-10vh) rotate(0deg); }
+  to{ transform:translateY(110vh) rotate(360deg); }
+}
+
+/* ---------------- HEADER ---------------- */
+header{
+  background:rgba(255,240,247,0.9);
+  padding:30px 20px;
+  text-align:center;
+  font-family:'Playfair Display', serif;
+  font-size:42px;
+  color:#c2477b;
+  position:relative;
+  z-index:3;
+}
+
+/* ---------------- MAIN ---------------- */
+main{
+  padding:50px 18px;
+  display:flex;
+  justify-content:center;
+  position:relative;
+  z-index:3;
+}
+
+/* ---------------- CONTENT FRAME ---------------- */
+.content-frame{
+  max-width:940px;
+  width:100%;
+  background:rgba(255,255,255,.45);
+  border-radius:40px;
+  padding:30px;
+  border:2px solid rgba(255,170,215,0.55);
+  backdrop-filter:blur(4px);
+  box-shadow:0 0 0 8px rgba(255,190,225,0.35),
+             0 25px 70px rgba(255,140,190,.35);
+}
+
+/* ---------------- GALLERY (HORIZONTAL SWIPER) ---------------- */
+.album-section{margin-top:15px;}
+
+.album-section h3{
+  text-align:center;
+  font-family:'Playfair Display', serif;
+  color:#ff3399;
+  margin:30px 0 16px;
+}
+
+.album-grid{
+  display: flex;
+  gap:14px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+}
+
+.album-grid::-webkit-scrollbar {
+  height:8px;
+}
+.album-grid::-webkit-scrollbar-thumb {
+  background: #ff9dcc;
+  border-radius:4px;
+}
+
+.album-grid a{
+  flex: 0 0 auto;
+  width:140px;
+  height:140px;
+  cursor:pointer;
+  border-radius:16px;
+  overflow:hidden;
+  border:3px solid #fff;
+  box-shadow:0 6px 15px rgba(255,130,200,.25);
+  position:relative;
+  transition:.2s;
+}
+.album-grid a:hover{
+  transform:scale(1.05);
+  box-shadow:0 10px 25px rgba(255,120,190,.35);
+}
+
+.album-grid img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* ---------------- LIGHTBOX ---------------- */
+#lightbox{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+  z-index:7000;
+}
+#lightbox.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.lightbox-content{
+  position:relative;
+  max-width:90vw;
+  max-height:90vh;
+  text-align:center;
+}
+
+.lightbox-content img{
+  max-width:100%;
+  max-height:75vh;
+  border-radius:18px;
+  box-shadow:0 20px 50px rgba(0,0,0,.45);
+}
+
+.lightbox-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:none;
+  background:white;
+  font-size:22px;
+  cursor:pointer;
+}
+.lightbox-btn:hover{
+  background:#ff9dcc;
+  color:white;
+}
+
+#prevBtn{ left:-60px; }
+#nextBtn{ right:-60px; }
+
+#closeBtn{
+  position:absolute;
+  top:-50px;
+  right:0;
+  width:38px;
+  height:38px;
+  border:none;
+  border-radius:50%;
+  font-size:18px;
+  color:white;
+  background:#ff6fb2;
+  cursor:pointer;
+}
+#closeBtn:hover{ background:#ff1f8c; }
+
+@media(max-width:600px){
+  #prevBtn{left:4px;}
+  #nextBtn{right:4px;}
+  header{font-size:30px;}
+}
+
+footer{
+  padding:18px;
+  text-align:center;
+  background:rgba(255,235,245,.9);
+  margin-top:40px;
+  position:relative;
+  z-index:3;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- MENU BUTTON -->
+<button class="menu-btn" id="menuBtn">☰</button>
+
+<!-- NAVIGATION -->
+<nav id="primaryNav">
+<ul>
+  <li><a href="index.html">❤ Home</a></li>
+  <li><a href="aboutme.html">✉ About Me</a></li>
+  <li><a href="experience.html">➤ Experience</a></li>
+  <li><a href="education.html">❀ Education</a></li>
+  <li><a href="family.html">☾ Family</a></li>
+  <li><a href="friends.html">∞ Friends</a></li>
+  <li><a href="favourites.html">★ Favourites</a></li>
+  <li><a href="gallery.html">☁ Gallery</a></li>
+</ul>
+</nav>
+
+<div id="page-overlay"></div>
+
+<!-- FLOWERS -->
+<div class="flower-container"></div>
+
+<header>A LITTLE SPACE OF MINE ✿˖˚ ༘𐙚</header>
+
+<main>
+<div class="content-frame">
+
+<div class="album-section">
+
+<h3>Little Me Moments</h3>
+<div class="album-grid">
+  <a><img src="nurin1.jpg"></a>
+  <a><img src="nurin2.jpg"></a>
+  <a><img src="nurin3.jpg"></a>
+  <a><img src="nurin4.jpg"></a>
+  <a><img src="nurin5.jpg"></a>
+  <a><img src="nurin6.jpg"></a>
+</div>
+
+<h3>Home & Heart</h3>
+<div class="album-grid">
+  <a><img src="family1.jpg"></a>
+  <a><img src="family2.jpg"></a>
+  <a><img src="family3.jpg"></a>
+  <a><img src="family4.jpg"></a>
+  <a><img src="family5.jpg"></a>
+  <a><img src="family6.jpg"></a>
+</div>
+
+<h3>Kindred Spirits</h3>
+<div class="album-grid">
+  <a><img src="friends1.jpg"></a>
+  <a><img src="friends2.jpg"></a>
+  <a><img src="friends3.jpg"></a>
+  <a><img src="friends4.jpg"></a>
+  <a><img src="friends5.jpg"></a>
+
+</div>
+</div>
+</main>
+
+<footer>
+© 2025 Nurin · A little space filled with big dreams
+</footer>
+
+<!-- ---------------- LIGHTBOX ---------------- -->
+<div id="lightbox">
+  <div class="lightbox-content">
+    <button id="closeBtn">✕</button>
+    <button id="prevBtn" class="lightbox-btn">‹</button>
+    <button id="nextBtn" class="lightbox-btn">›</button>
+    <img id="lightbox-img">
+  </div>
+</div>
+
+<!-- ---------------- JS ---------------- -->
+<script>
+
+/* NAVIGATION */
+const menuBtn = document.getElementById("menuBtn");
+const nav = document.getElementById("primaryNav");
+const overlay = document.getElementById("page-overlay");
+
+function toggleNav(){
+  nav.classList.toggle("show");
+  document.body.classList.toggle("nav-open");
+}
+menuBtn.addEventListener("click", toggleNav);
+overlay.addEventListener("click", toggleNav);
+
+/* LIGHTBOX */
+const gallery = document.querySelectorAll(".album-grid a");
+const lightbox = document.getElementById("lightbox");
+const imgBox = document.getElementById("lightbox-img");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const closeBtn = document.getElementById("closeBtn");
+
+let index = 0;
+
+gallery.forEach((item,i)=>{
+  item.addEventListener("click", ()=>{
+    index = i;
+    imgBox.src = gallery[index].querySelector("img").src;
+    lightbox.classList.add("show");
+  });
+});
+
+function showNext(){ index = (index + 1) % gallery.length; imgBox.src = gallery[index].querySelector("img").src; }
+function showPrev(){ index = (index - 1 + gallery.length) % gallery.length; imgBox.src = gallery[index].querySelector("img").src; }
+
+nextBtn.onclick = showNext;
+prevBtn.onclick = showPrev;
+closeBtn.onclick = ()=> lightbox.classList.remove("show");
+
+lightbox.addEventListener("click",e=>{
+ if(e.target === lightbox) closeBtn.click();
+});
+
+/* LIGHTBOX SWIPE (MOBILE) */
+let startX=0,endX=0;
+imgBox.addEventListener("touchstart", e=>{startX=e.touches[0].clientX;});
+imgBox.addEventListener("touchmove", e=>{endX=e.touches[0].clientX;});
+imgBox.addEventListener("touchend", ()=>{
+  if(startX-endX>50) showNext();
+  else if(endX-startX>50) showPrev();
+});
+
+/* LIGHTBOX DRAG (DESKTOP) */
+let isDragging=false,startXMouse=0;
+imgBox.addEventListener("mousedown", e=>{isDragging=true;startXMouse=e.clientX;});
+imgBox.addEventListener("mouseup", e=>{if(!isDragging) return; isDragging=false; const diff=startXMouse-e.clientX; if(diff>50) showNext(); else if(diff<-50) showPrev();});
+imgBox.addEventListener("mouseleave", ()=>isDragging=false);
+
+/* LIGHTBOX KEYBOARD */
+document.addEventListener("keydown", e=>{
+  if(!lightbox.classList.contains("show")) return;
+  if(e.key==="ArrowRight") showNext();
+  if(e.key==="ArrowLeft") showPrev();
+  if(e.key==="Escape") closeBtn.click();
+});
+
+/* THUMBNAIL SWIPE (HORIZONTAL SCROLLER) */
+document.querySelectorAll('.album-grid').forEach(grid=>{
+  let isDown=false,startX,scrollLeft;
+  grid.addEventListener('mousedown', e=>{isDown=true; startX=e.pageX-grid.offsetLeft; scrollLeft=grid.scrollLeft;});
+  grid.addEventListener('mouseleave', ()=>isDown=false);
+  grid.addEventListener('mouseup', ()=>isDown=false);
+  grid.addEventListener('mousemove', e=>{if(!isDown) return; e.preventDefault(); const x=e.pageX-grid.offsetLeft; grid.scrollLeft=scrollLeft-(x-startX)*2;});
+  grid.addEventListener('touchstart', e=>{startX=e.touches[0].pageX; scrollLeft=grid.scrollLeft;});
+  grid.addEventListener('touchmove', e=>{const x=e.touches[0].pageX; grid.scrollLeft=scrollLeft-(x-startX)*2;});
+});
+
+/* FLOATING FLOWERS */
+const flowerWrap = document.querySelector(".flower-container");
+for(let i=0;i<28;i++){ spawnFlower(); }
+function spawnFlower(){
+  const flr=document.createElement("div");
+  flr.className="flower";
+  flr.style.left=Math.random()*100+"vw";
+  const size=Math.random()*12+10;
+  flr.style.width=size+"px";
+  flr.style.height=size+"px";
+  const dur=Math.random()*9+7;
+  flr.style.animationDuration=dur+"s";
+  flr.style.opacity=Math.random()*0.4+0.4;
+  flowerWrap.appendChild(flr);
+  setTimeout(()=>{flr.remove(); spawnFlower();}, dur*1000);
+}
+
+</script>
+</body>
+</html>
